@@ -1,0 +1,28 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const app = express();
+app.use(bodyParser.json());
+
+app.post('/get_response', async (req, res) => {
+    const userInput = req.body.input;
+    try {
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+            model: "gpt-4",
+            messages: [{ role: "user", content: userInput }]
+        }, {
+            headers: {
+                'Authorization': `Bearer YOUR_API_KEY`,
+                'Content-Type': 'application/json'
+            }
+        });
+        res.send(response.data.choices[0].message.content);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Klaida gaunant atsakymą.');
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Serveris veikia ant porto 3000');
+});
